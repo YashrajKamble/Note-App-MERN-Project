@@ -61,3 +61,5 @@ docker-compose.override.yaml
 
 # Test coverage
 .nyc_output/
+
+settings.json
