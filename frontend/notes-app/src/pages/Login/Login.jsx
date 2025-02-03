@@ -1,5 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import axiosInstance from "../../utils/axiosInstance"; // ✅ Added Axios Import
 import PasswordInput from "../../components/Input/PasswordInput";
 import Navbar from "../../components/Navbar/Navbar";
 import { validateEmail } from "../../utils/helper";
@@ -9,11 +10,13 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
 
+  const navigate = useNavigate();
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
     if (!validateEmail(email)) {
-      setError("Please enter  valid email address");
+      setError("Please enter a valid email address");
       return;
     }
 
@@ -21,9 +24,24 @@ const Login = () => {
       setError("Please enter the password");
       return;
     }
-    setError("");
+    setError(null); // ✅ Updated from setError("") to setError(null)
 
-    // login api call
+    try {
+      const response = await axiosInstance.post("/login", {
+        email,
+        password,
+      });
+      if (response.data && response.data.accessToken) {
+        localStorage.setItem("token", response.data.accessToken);
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      if (error.response?.data?.message) {
+        setError(error.response.data.message);
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    }
   };
 
   return (
@@ -55,13 +73,7 @@ const Login = () => {
             </button>
 
             <p className="text-sm text-center mt-4">
-              Not registered yet?{" "}
-              <Link
-                to="/signUp "
-                className="font-medium text-primary underline"
-              >
-                Create an Account
-              </Link>
+              Not registered yet? <Link to="/signUp" className="font-medium text-primary underline">Create an Account</Link>
             </p>
           </form>
         </div>
