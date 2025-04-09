@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 // import React from "react";
+import moment from "moment";
 import { MdOutlinePushPin } from "react-icons/md";
 import { MdCreate, MdDelete } from "react-icons/md";
 
@@ -18,7 +19,9 @@ const NoteCard = ({
       <div className="flex items-center justify-between">
         <div>
           <h6 className="text-sm font-medium">{title}</h6>
-          <span className="text-sm text-slate-500">{date}</span>
+          <span className="text-sm text-slate-500">
+            {moment(date).format("Do MMM YYYY")}
+          </span>
         </div>
         <MdOutlinePushPin
           className={`icon-btn ${isPinned ? "text-primary" : "text-slate-300"}`}
@@ -28,7 +31,9 @@ const NoteCard = ({
       <p className="text-xs text-slate-600 mt-2">{content?.slice(0, 60)}</p>
 
       <div className="flex items-center justify-between mt-2">
-        <div className="text-sm text-slate-500">{tags}</div>
+        <div className="text-sm text-slate-500">
+          {tags.map((item) => ` #${item}`)}
+        </div>
 
         <div className="flex items-center gap-2">
           <MdCreate
