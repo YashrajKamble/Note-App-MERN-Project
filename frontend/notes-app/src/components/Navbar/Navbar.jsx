@@ -1,16 +1,18 @@
-// import React from 'react'
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ProfileInfo from "../Cards/ProfileInfo";
 import SearchBar from "../SearchBar/SearchBar";
+import PropTypes from "prop-types";
 
-const Navbar = () => {
+const Navbar = ({ userInfo }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const navigator = useNavigate;
+  const navigate = useNavigate(); // Correctly call the hook
 
   const onLogout = () => {
-    navigator("/login");
+    localStorage.clear();
+    navigate("/login");
   };
+
   const handleSearch = () => {};
 
   const onClearSearch = () => {
@@ -30,9 +32,13 @@ const Navbar = () => {
         onClearSearch={onClearSearch}
       />
 
-      <ProfileInfo onLogout={onLogout} />
+      <ProfileInfo userInfo={userInfo} onLogout={onLogout} />
     </div>
   );
+};
+
+Navbar.propTypes = {
+  userInfo: PropTypes.object, // You can extend this shape if needed
 };
 
 export default Navbar;
