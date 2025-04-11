@@ -1,5 +1,6 @@
 // import React from "react";
 import { useState } from "react";
+import PropTypes from "prop-types"; // <-- Added PropTypes import
 import { MdAdd, MdClose } from "react-icons/md";
 
 const TagInput = ({ tags, setTags }) => {
@@ -37,11 +38,7 @@ const TagInput = ({ tags, setTags }) => {
                 className="flex items-center gap-2 text-sm text-slate-900 bg-slate-100 py-1 rounded"
               >
                 #{tag}
-                <button
-                  onClick={() => {
-                    handleRemoveTags(tag);
-                  }}
-                >
+                <button onClick={() => handleRemoveTags(tag)}>
                   <MdClose />
                 </button>
               </span>
@@ -62,15 +59,19 @@ const TagInput = ({ tags, setTags }) => {
 
         <button
           className="w-8 h-8 flex items-center justify-center rounded border border-blue-700 hover:bg-blue-700"
-          onClick={() => {
-            addNewTag();
-          }}
+          onClick={addNewTag}
         >
           <MdAdd className="text-2xl text-blue-700 hover:text-white" />
         </button>
       </div>
     </div>
   );
+};
+
+// Added prop type validations for the component props
+TagInput.propTypes = {
+  tags: PropTypes.arrayOf(PropTypes.string).isRequired, // Ensure tags is an array of strings
+  setTags: PropTypes.func.isRequired, // Ensure setTags is a function
 };
 
 export default TagInput;

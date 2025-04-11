@@ -1,16 +1,61 @@
 import { useState } from "react";
+import PropTypes from "prop-types"; // <-- Added PropTypes import
 import { MdClose } from "react-icons/md";
 import TagInput from "../../components/Input/TagInput";
+import axiosInstance from "../../utils/axiosInstance";
 
-const AddEditNotes = ({ onclose, noteClose, type }) => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [tags, setTags] = useState([]);
+const AddEditNotes = ({ noteData, onclose, noteClose, getAllnotes, type }) => {
+  const [title, setTitle] = useState(noteData.title || "");
+  const [content, setContent] = useState(noteData.content || "");
+  const [tags, setTags] = useState(noteData.tags || []);
 
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
 
-  const addNewNote = async () => {};
-  const editNote = async () => {};
+  // add notes
+  const addNewNote = async () => {
+    try {
+      const response = await axiosInstance.post("./add-note", {
+        title,
+        content,
+        tags,
+      });
+      if (response.data && response.data.note) {
+        getAllnotes();
+        onclose();
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message);
+      }
+    }
+  };
+
+  // edit note
+  const editNote = async () => {
+    try {
+      const response = await axiosInstance.put("./edit-note", {
+        title,
+        content,
+        tags,
+      });
+      if (response.data && response.data.note) {
+        getAllnotes();
+        onclose();
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message);
+      }
+    }
+  };
 
   const handleAddNote = () => {
     if (!title) {
@@ -40,7 +85,7 @@ const AddEditNotes = ({ onclose, noteClose, type }) => {
         <MdClose className="text-xl text-slate-400" />
       </button>
       <div className="flex flex-col gap-2">
-        <label className=" input-label">TITLE</label>
+        <label className="input-label">TITLE</label>
         <input
           type="text"
           className="text-2xl text-slate-950 outline-none"
@@ -50,7 +95,7 @@ const AddEditNotes = ({ onclose, noteClose, type }) => {
         />
       </div>
       <div className="flex flex-col gap-2 mt-4">
-        <label className="input-label ">CONTENT</label>
+        <label className="input-label">CONTENT</label>
         <textarea
           type="text"
           className="text-sm text-slate-950 outline-none bg-slate-50 p-2 rounded"
@@ -64,15 +109,24 @@ const AddEditNotes = ({ onclose, noteClose, type }) => {
         <label className="input-label">TAGS</label>
         <TagInput tags={tags} setTags={setTags} />
       </div>
-      {error && <p className="text-red-500 text-xs pt-4">{error}</p>}{" "}
+      {error && <p className="text-red-500 text-xs pt-4">{error}</p>}
       <button
-        className="btn-primary font-medium mt-5 p-3 "
+        className="btn-primary font-medium mt-5 p-3"
         onClick={handleAddNote}
       >
-        ADD
+        {type === "edit" ? "UPDATE" : "ADD"}
       </button>
     </div>
   );
+};
+
+// Added PropTypes validation for the component props
+AddEditNotes.propTypes = {
+  onclose: PropTypes.func.isRequired,
+  noteClose: PropTypes.func, // Optional if not used
+  getAllnotes: PropTypes.func.isRequired,
+  type: PropTypes.string.isRequired,
+  noteData: PropTypes.string.isRequired,
 };
 
 export default AddEditNotes;
