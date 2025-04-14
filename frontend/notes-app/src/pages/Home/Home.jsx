@@ -6,7 +6,7 @@ import Navbar from "../../components/Navbar/Navbar";
 import NoteCard from "../../components/Cards/NoteCard";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosInstance";
-import moment from "moment";
+// import moment from "moment";
 import Toast from "../../../src/components/ToastMessage/Toast";
 import EmptyCard from "../../components/EmptyCard/EmptyCard";
 
@@ -180,7 +180,7 @@ const Home = () => {
           setOpenAddEditModal({ isShown: true, type: "add", data: null });
         }}
       >
-        <MdAdd className="text-{32px} text-white" />
+        <MdAdd className="text-2xl text-white" />
       </button>
 
       <Modal

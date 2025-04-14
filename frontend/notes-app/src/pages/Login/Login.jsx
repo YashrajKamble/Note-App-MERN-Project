@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import axiosInstance from "../../utils/axiosInstance"; 
+import axiosInstance from "../../utils/axiosInstance";
 import PasswordInput from "../../components/Input/PasswordInput";
 import Navbar from "../../components/Navbar/Navbar";
 import { validateEmail } from "../../utils/helper";
@@ -8,7 +8,7 @@ import { validateEmail } from "../../utils/helper";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null); 
+  const [error, setError] = useState(null);
 
   const navigate = useNavigate();
 
@@ -25,7 +25,7 @@ const Login = () => {
       setError("Please enter the password");
       return;
     }
-    setError(null); 
+    setError(null);
 
     // Login API call
     try {
@@ -52,14 +52,16 @@ const Login = () => {
 
   return (
     <>
-      <Navbar />
-      <div className="flex justify-center items-center mt-28">
+      {/* <Navbar /> */}
+      <div className="flex justify-center items-center mt-56">
         <div className="w-96 border rounded bg-white px-7 py-10">
           <form onSubmit={handleLogin}>
             <h4 className="text-2xl mb-7">Login</h4>
 
             <input
               type="text"
+              name="email"
+              autoComplete="email"
               placeholder="Email"
               className="input-box"
               value={email}

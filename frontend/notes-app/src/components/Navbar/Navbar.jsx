@@ -20,8 +20,10 @@ const Navbar = ({ userInfo, onSearchNote }) => {
     }
   };
 
+  // Updated onClearSearch function that reloads the page automatically.
   const onClearSearch = () => {
     setSearchQuery("");
+    window.location.reload();
   };
 
   return (
@@ -30,9 +32,7 @@ const Navbar = ({ userInfo, onSearchNote }) => {
 
       <SearchBar
         value={searchQuery}
-        onChange={({ target }) => {
-          setSearchQuery(target.value);
-        }}
+        onChange={({ target }) => setSearchQuery(target.value)}
         handleSearch={handleSearch}
         onClearSearch={onClearSearch}
       />
@@ -43,7 +43,7 @@ const Navbar = ({ userInfo, onSearchNote }) => {
 };
 
 Navbar.propTypes = {
-  userInfo: PropTypes.object, // You can extend this shape if needed
+  userInfo: PropTypes.object,
 };
 
 export default Navbar;
