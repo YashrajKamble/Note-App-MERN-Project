@@ -7,12 +7,19 @@ import NoteCard from "../../components/Cards/NoteCard";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosInstance";
 import moment from "moment";
+import Toast from "../../../src/components/ToastMessage/Toast";
 
 const Home = () => {
   const [openAddEditModal, setOpenAddEditModal] = useState({
-    isShow: false,
+    isShown: false,
     type: "add",
     data: null,
+  });
+
+  const [showToastMsg, setShowToastMsg] = useState({
+    isShown: false,
+    message: "",
+    type: "add",
   });
 
   const [allNotes, setAllNotes] = useState([]);
@@ -20,7 +27,22 @@ const Home = () => {
   const navigate = useNavigate();
 
   const handleEdit = (noteDetails) => {
-    setOpenAddEditModal({ isShow: true, data: noteDetails, type: "edit" });
+    setOpenAddEditModal({ isShown: true, data: noteDetails, type: "edit" });
+  };
+
+  const showToastMessage = (message, type) => {
+    setShowToastMsg({
+      isShown: true,
+      message,
+      type,
+    });
+  };
+
+  const handleCloseToast = () => {
+    setShowToastMsg({
+      isShown: false,
+      message: "",
+    });
   };
 
   // get user info
@@ -81,16 +103,16 @@ const Home = () => {
       <button
         className="w-16 h-16 flex items-center justify-center rounded-2xl bg-primary hover:bg-blue-600 absolute right-10 bottom-10"
         onClick={() => {
-          setOpenAddEditModal({ isShow: true, type: "add", data: null });
+          setOpenAddEditModal({ isShown: true, type: "add", data: null });
         }}
       >
         <MdAdd className="text-{32px} text-white" />
       </button>
 
       <Modal
-        isOpen={openAddEditModal.isShow}
+        isOpen={openAddEditModal.isShown}
         onRequestClose={() => {
-          setOpenAddEditModal({ isShow: false, type: "add", data: null });
+          setOpenAddEditModal({ isShown: false, type: "add", data: null });
         }}
         style={{
           overlay: {
@@ -104,11 +126,19 @@ const Home = () => {
           type={openAddEditModal.type}
           noteData={openAddEditModal.data}
           onclose={() => {
-            setOpenAddEditModal({ isShow: false, type: "add", data: null });
+            setOpenAddEditModal({ isShown: false, type: "add", data: null });
           }}
           getAllnotes={getAllnotes}
+          showToastMessage={showToastMessage}
         />
       </Modal>
+
+      <Toast
+        isShown={showToastMsg.isShown}
+        message={showToastMsg.message}
+        type={showToastMsg.type}
+        onclose={handleCloseToast}
+      />
     </>
   );
 };
