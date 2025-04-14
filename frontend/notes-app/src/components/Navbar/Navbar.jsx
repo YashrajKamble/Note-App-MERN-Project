@@ -4,7 +4,7 @@ import ProfileInfo from "../Cards/ProfileInfo";
 import SearchBar from "../SearchBar/SearchBar";
 import PropTypes from "prop-types";
 
-const Navbar = ({ userInfo }) => {
+const Navbar = ({ userInfo, onSearchNote }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate(); // Correctly call the hook
 
@@ -13,7 +13,11 @@ const Navbar = ({ userInfo }) => {
     navigate("/login");
   };
 
-  const handleSearch = () => {};
+  const handleSearch = () => {
+    if (searchQuery) {
+      onSearchNote(searchQuery);
+    }
+  };
 
   const onClearSearch = () => {
     setSearchQuery("");

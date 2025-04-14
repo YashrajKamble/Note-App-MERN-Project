@@ -25,6 +25,9 @@ const Home = () => {
 
   const [allNotes, setAllNotes] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
+
+  const [isSearch, setIsSearch] = useState(false);
+
   const navigate = useNavigate();
 
   const handleEdit = (noteDetails) => {
@@ -74,6 +77,7 @@ const Home = () => {
     }
   };
 
+  // note delete
   const deleteNote = async (data) => {
     const noteId = data._id;
 
@@ -95,6 +99,22 @@ const Home = () => {
     }
   };
 
+  // search for note
+  const onSearchNote = async (query) => {
+    try {
+      const response = await axiosInstance.get("/search-notes", {
+        params: { query },
+      });
+
+      if (response.data && response.data.notes) {
+        setIsSearch(true);
+        setAllNotes(response.data.notes);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     getAllnotes();
     getUserInfo();
@@ -102,7 +122,7 @@ const Home = () => {
 
   return (
     <>
-      <Navbar userInfo={userInfo} />
+      <Navbar userInfo={userInfo} onSearchNote={onSearchNote} />
 
       <div className="container mx-auto">
         {allNotes.length > 0 ? (
@@ -124,7 +144,11 @@ const Home = () => {
         ) : (
           <EmptyCard
             // imgsrc={}
-            message={`Start creating your first note! Click the "Add" button to write down your thoughts,ideas, and remainders. Let's get started `}
+            message={
+              isSearch
+                ? "Oops! No Notes found matching your search. "
+                : `Start creating your first note! Click the "Add" button to write down your thoughts,ideas, and remainders. Let's get started `
+            }
           />
         )}
       </div>
