@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import PropTypes from "prop-types"; 
+import PropTypes from "prop-types";
 
 import { LuCheck } from "react-icons/lu";
 import { MdDeleteOutline } from "react-icons/md";
