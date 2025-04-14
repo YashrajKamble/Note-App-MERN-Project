@@ -5,9 +5,9 @@ import TagInput from "../../components/Input/TagInput";
 import axiosInstance from "../../utils/axiosInstance";
 
 const AddEditNotes = ({ noteData, onclose, noteClose, getAllnotes, type }) => {
-  const [title, setTitle] = useState(noteData.title || "");
-  const [content, setContent] = useState(noteData.content || "");
-  const [tags, setTags] = useState(noteData.tags || []);
+  const [title, setTitle] = useState(noteData?.title || "");
+  const [content, setContent] = useState(noteData?.content || "");
+  const [tags, setTags] = useState(noteData?.tags || []);
 
   const [error, setError] = useState(null);
 
@@ -36,8 +36,10 @@ const AddEditNotes = ({ noteData, onclose, noteClose, getAllnotes, type }) => {
 
   // edit note
   const editNote = async () => {
+    const noteId = noteData._id;
+
     try {
-      const response = await axiosInstance.put("./edit-note", {
+      const response = await axiosInstance.put("./edit-note/" + noteId, {
         title,
         content,
         tags,
