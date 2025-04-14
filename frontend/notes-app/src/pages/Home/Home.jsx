@@ -59,7 +59,8 @@ const Home = () => {
     } catch (error) {
       if (error.response && error.response.status === 401) {
         localStorage.clear();
-        navigate("/login");
+        // navigate("/login");
+        navigate("/");
       }
     }
   };
@@ -122,11 +123,12 @@ const Home = () => {
       const response = await axiosInstance.put(
         "/update-note-pinned/" + noteId,
         {
-          isPinned: !noteId.isPinned,
+          // Changed from noteId.isPinned to noteData.isPinned for correct toggle behavior.
+          isPinned: !noteData.isPinned,
         }
       );
       if (response.data && response.data.note) {
-        showToastMessage("Note Update Successfully");
+        showToastMessage("Note Updated Successfully");
         getAllnotes();
       }
     } catch (error) {
