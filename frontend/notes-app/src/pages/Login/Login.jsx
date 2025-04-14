@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import axiosInstance from "../../utils/axiosInstance"; // ✅ Added Axios Import
+import axiosInstance from "../../utils/axiosInstance"; 
 import PasswordInput from "../../components/Input/PasswordInput";
 import Navbar from "../../components/Navbar/Navbar";
 import { validateEmail } from "../../utils/helper";
@@ -8,37 +8,36 @@ import { validateEmail } from "../../utils/helper";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(null); 
 
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
+    localStorage.removeItem("token");
+
     if (!validateEmail(email)) {
       setError("Please enter a valid email address");
       return;
     }
-
     if (!password) {
       setError("Please enter the password");
       return;
     }
-    setError(null); // ✅ Updated from setError("") to setError(null)
+    setError(null); 
 
-    // Login API Call
+    // Login API call
     try {
       const response = await axiosInstance.post("/login", {
         email: email,
         password: password,
       });
-      // Handling successful login response
       if (response.data && response.data.accessToken) {
         localStorage.setItem("token", response.data.accessToken);
         navigate("/dashboard");
       }
     } catch (error) {
-      // handle login error
       if (
         error.response &&
         error.response.data &&

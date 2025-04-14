@@ -1,4 +1,3 @@
-// import React from 'react'
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
@@ -10,45 +9,44 @@ const SignUp = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(null); 
 
   const navigate = useNavigate();
 
   const handleSignUp = async (e) => {
     e.preventDefault();
 
+    localStorage.removeItem("token");
+
     if (!name) {
       setError("Please enter the name");
       return;
     }
     if (!validateEmail(email)) {
-      setError("Please enter  valid email address");
+      setError("Please enter a valid email address");
       return;
     }
     if (!password) {
       setError("Please enter the password");
       return;
     }
-    setError("");
+    setError(null);
 
-    // signUp api call
     try {
       const response = await axiosInstance.post("/create-account", {
         fullName: name,
         email: email,
         password: password,
       });
-      // Handling successful registration response
       if (response.data && response.data.error) {
         setError(response.data.message);
+        return;
       }
-
       if (response.data && response.data.accessToken) {
         localStorage.setItem("token", response.data.accessToken);
         navigate("/dashboard");
       }
     } catch (error) {
-      // handle login error
       if (
         error.response &&
         error.response.data &&
@@ -67,8 +65,7 @@ const SignUp = () => {
       <div className="flex justify-center items-center mt-28">
         <div className="w-96 border rounded bg-white px-7 py-10">
           <form onSubmit={handleSignUp}>
-            <h4 className="text-2xl mb-7">Login</h4>
-
+            <h4 className="text-2xl mb-7">Sign Up</h4>
             <input
               type="text"
               placeholder="Name"
@@ -85,6 +82,7 @@ const SignUp = () => {
             />
             <PasswordInput
               value={password}
+              placeholder="Password"
               onChange={(e) => setPassword(e.target.value)}
             />
             {error && <p className="text-red-500 text-xs pb-1">{error}</p>}
@@ -94,8 +92,8 @@ const SignUp = () => {
             </button>
 
             <p className="text-sm text-center mt-4">
-              Already have an account?
-              <Link to="/login " className="font-medium text-primary underline">
+              Already have an account?{" "}
+              <Link to="/login" className="font-medium text-primary underline">
                 Login
               </Link>
             </p>

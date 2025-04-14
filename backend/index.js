@@ -13,7 +13,7 @@ const cors = require("cors");
 const app = express();
 
 const jwt = require("jsonwebtoken");
-const { authenticationToken } = require("./utilities")
+const { authenticationToken } = require("./utilities");
 
 app.use(express.json());
 
@@ -23,7 +23,7 @@ app.use(
     })
 );
 
-//home
+// Home endpoint
 app.get("/", (req, res) => {
     res.json({ data: "hello" });
 });
@@ -35,16 +35,18 @@ app.post("/create-account", async (req, res) => {
     if (!fullName) {
         return res
             .status(400)
-            .json({ error: true, message: "Full Name is required" })
+            .json({ error: true, message: "Full Name is required" });
     }
 
     if (!email) {
-        return res.status(400).json({ error: true, message: "Email is required" })
+        return res
+            .status(400)
+            .json({ error: true, message: "Email is required" });
     }
     if (!password) {
         return res
             .status(400)
-            .json({ error: true, message: "Password is required" })
+            .json({ error: true, message: "Password is required" });
     }
     const isUser = await User.findOne({ email: email });
     if (isUser) {
@@ -56,20 +58,26 @@ app.post("/create-account", async (req, res) => {
     const user = new User({
         fullName,
         email,
-        password
+        password,
     });
     await user.save();
-    const accessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "36000m",
-    })
+
+    // --- UPDATED --- Sign only minimal fields into the JWT payload
+    const accessToken = jwt.sign(
+        { _id: user._id, email: user.email },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn: "36000m",
+        }
+    );
 
     return res.json({
         error: false,
         user,
         accessToken,
         message: "Registration Successfully",
-    })
-})
+    });
+});
 
 // Login
 app.post("/login", async (req, res) => {
@@ -86,34 +94,38 @@ app.post("/login", async (req, res) => {
     const userInfo = await User.findOne({ email: email });
 
     if (!userInfo) {
-        return res.status(400).json({ message: "User is required" });
+        return res.status(400).json({ message: "User not found" });
     }
 
-    if (userInfo.email == email && userInfo.password == password) {
-        const user = { user: userInfo };
-        const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-            expiresIn: "36000m",
-        });
+    if (userInfo.email === email && userInfo.password === password) {
+        // --- UPDATED --- Sign only minimal fields into the JWT payload
+        const accessToken = jwt.sign(
+            { _id: userInfo._id, email: userInfo.email },
+            process.env.ACCESS_TOKEN_SECRET,
+            {
+                expiresIn: "36000m",
+            }
+        );
 
         return res.json({
             error: false,
             message: "Login Successfully",
             email,
             accessToken,
-        })
-
+        });
     } else {
         return res.status(400).json({
             error: true,
             message: "Invalid Credentials",
-        })
+        });
     }
-})
+});
 
 // Get User
 app.get("/get-user", authenticationToken, async (req, res) => {
-    const { user } = req.user;
-    const isUser = await User.findOne({ _id: user._id });
+    // --- UPDATED --- Use _id from token directly
+    const { _id } = req.user;
+    const isUser = await User.findOne({ _id: _id });
 
     if (!isUser) {
         return res.sendStatus(401);
@@ -137,11 +149,15 @@ app.post("/add-note", authenticationToken, async (req, res) => {
     const user = req.user;
 
     if (!title) {
-        return res.status(400).json({ error: true, message: "Title is required" });
+        return res
+            .status(400)
+            .json({ error: true, message: "Title is required" });
     }
 
     if (!content) {
-        return res.status(400).json({ error: true, message: "Content is required" });
+        return res
+            .status(400)
+            .json({ error: true, message: "Content is required" });
     }
 
     try {
@@ -150,21 +166,20 @@ app.post("/add-note", authenticationToken, async (req, res) => {
             content,
             tags: tags || [],
             userId: user._id,
-        })
+        });
 
         await note.save();
 
         return res.json({
             error: false,
             note,
-            message: "Note added successfully"
-        })
-
+            message: "Note added successfully",
+        });
     } catch (error) {
         return res.status(500).json({
             error: true,
             message: "Internal Server Error",
-        })
+        });
     }
 });
 
@@ -174,7 +189,7 @@ app.put("/edit-note/:noteId", authenticationToken, async (req, res) => {
     const { title, content, isPinned, tags } = req.body;
     const user = req.user;
 
-    if (!title && !content && !tags && typeof isPinned !== 'boolean') {
+    if (!title && !content && !tags && typeof isPinned !== "boolean") {
         return res
             .status(400)
             .json({ error: true, message: "No changes provided" });
@@ -190,21 +205,20 @@ app.put("/edit-note/:noteId", authenticationToken, async (req, res) => {
         if (title) note.title = title;
         if (content) note.content = content;
         if (tags) note.tags = tags;
-        if (typeof isPinned === 'boolean') note.isPinned = isPinned;
-        // if (user) note.userId = user;
+        if (typeof isPinned === "boolean") note.isPinned = isPinned;
+
         await note.save();
 
         return res.json({
             error: false,
             note,
-            message: "Note updated successfully"
+            message: "Note updated successfully",
         });
-
     } catch (error) {
         console.error(error);
         return res.status(500).json({
             error: true,
-            message: "Internal Server Error"
+            message: "Internal Server Error",
         });
     }
 });
@@ -218,17 +232,16 @@ app.get("/get-all-notes/", authenticationToken, async (req, res) => {
             error: false,
             notes,
             message: "All notes fetched successfully",
-        })
-
+        });
     } catch (error) {
         return res.status(500).json({
             error: true,
             message: "Internal Server Error",
-        })
+        });
     }
 });
 
-// delete notes
+// Delete Note
 app.delete("/delete-note/:noteId", authenticationToken, async (req, res) => {
     const noteId = req.params.noteId;
     const user = req.user;
@@ -243,18 +256,18 @@ app.delete("/delete-note/:noteId", authenticationToken, async (req, res) => {
         await Note.deleteOne({ _id: noteId, userId: user._id });
         return res.json({
             error: false,
-            message: "Note deleted successfully"
+            message: "Note deleted successfully",
         });
     } catch (error) {
         console.error(error);
         return res.status(500).json({
             error: true,
-            message: "Internal Server Error"
+            message: "Internal Server Error",
         });
     }
 });
 
-//Update IsPinned Value
+// Update IsPinned Value
 app.put("/update-note-pinned/:noteId", authenticationToken, async (req, res) => {
     const noteId = req.params.noteId;
     const { isPinned } = req.body;
@@ -276,20 +289,18 @@ app.put("/update-note-pinned/:noteId", authenticationToken, async (req, res) => 
         return res.json({
             error: false,
             note,
-            message: "Note updated successfully"
+            message: "Note updated successfully",
         });
-
     } catch (error) {
         console.error(error);
         return res.status(500).json({
             error: true,
-            message: "Internal Server Error"
+            message: "Internal Server Error",
         });
     }
-}
-);
+});
 
-//Search Box
+// Search Notes
 app.get("/search-notes/", authenticationToken, async (req, res) => {
     const user = req.user;
     const query = req.query.query && req.query.query.trim();
@@ -297,7 +308,7 @@ app.get("/search-notes/", authenticationToken, async (req, res) => {
     if (!query) {
         return res.status(400).json({
             error: true,
-            message: "Search query is required"
+            message: "Search query is required",
         });
     }
     try {
@@ -306,21 +317,20 @@ app.get("/search-notes/", authenticationToken, async (req, res) => {
             $or: [
                 { title: { $regex: new RegExp(query, "i") } },
                 { content: { $regex: new RegExp(query, "i") } },
-            ]
+            ],
         });
         return res.json({
             error: false,
             notes: matchingNotes,
-            message: "Notes matching the search query retrieved successfully"
+            message: "Notes matching the search query retrieved successfully",
         });
     } catch (error) {
         return res.status(500).json({
             error: true,
-            message: "Internal Server Error"
+            message: "Internal Server Error",
         });
     }
 });
-
 
 app.listen(8000);
 
