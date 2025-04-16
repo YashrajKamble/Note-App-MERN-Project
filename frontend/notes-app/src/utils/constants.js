@@ -1,1 +1,1 @@
-export const BASE_URL = 'http://localhost:8000';
+export const BASE_URL = 'https://note-app-mern-project-3nb0.onrender.com';
